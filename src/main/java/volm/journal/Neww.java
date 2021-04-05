@@ -1,4 +1,4 @@
 package volm.journal;
 
-public class New {
+public class Neww {
 }
