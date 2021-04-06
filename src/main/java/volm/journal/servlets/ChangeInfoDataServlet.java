@@ -7,6 +7,9 @@ import volm.journal.dao.impl.UserDaoImpl;
 import volm.journal.enums.Role;
 import volm.journal.model.Group;
 import volm.journal.model.User;
+import volm.journal.model.UserDto;
+import volm.journal.service.UserService;
+import volm.journal.service.impl.UserServiceImpl;
 import volm.journal.util.SecurityUtil;
 
 import javax.servlet.ServletException;
@@ -24,6 +27,8 @@ public class ChangeInfoDataServlet extends HttpServlet {
 
     private final UserDao userDao = new UserDaoImpl();
     private final GroupDao groupDao = new GroupDaoImpl();
+
+    UserService userService = new UserServiceImpl();
 
 
     @Override
@@ -43,27 +48,27 @@ public class ChangeInfoDataServlet extends HttpServlet {
         String password = req.getParameter("password");
         String npassword = req.getParameter("npassword");
 
-        Group group = groupDao.findById(groupId)
-                .orElseThrow(() -> new NoSuchElementException());
-
-        String salt = SecurityUtil.generateRandomSalt();
-        String newHashedPassword = SecurityUtil.getSecurePassword(npassword, salt);
+        UserDto userDto = UserDto.UserDtoBuilder.anUserDto()
+                .id(id)
+                .name(name)
+                .email(email)
+                .phone(phone)
+                .groupId(groupId)
+                .role(role)
+                .password(password)
+                .npassword(npassword)
+                .build();
 
         User currentUser = (User) req.getSession().getAttribute("currentUser");
 
-        User changedUser = new User(id, name, email, phone, newHashedPassword, salt, group, role);
+        User changedUser = userService.updateUserInfo(userDto, currentUser);
 
-        String hashedPassword = SecurityUtil.getSecurePassword(password, currentUser.getSalt());
-
-        if (!currentUser.getPassword().equals(hashedPassword)) {
+        if (!currentUser.getId().equals(changedUser.getId())) {
 
             String errorMessage = "You entered wrong current password";
             req.setAttribute("errorMessage", errorMessage);
             req.getRequestDispatcher("changeInfo.jsp").forward(req, resp);
         }
-
-        userDao.update(changedUser);
-
         HttpSession session = req.getSession();
         session.removeAttribute("currentUser");
         session.setAttribute("currentUser", changedUser);

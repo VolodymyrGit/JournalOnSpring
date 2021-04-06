@@ -1,8 +1,10 @@
 package volm.journal.servlets;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import volm.journal.dao.UserDao;
 import volm.journal.dao.impl.UserDaoImpl;
 import volm.journal.model.User;
+import volm.journal.repo.UserRepo;
 import volm.journal.service.UserService;
 import volm.journal.service.impl.UserServiceImpl;
 
@@ -18,6 +20,9 @@ import java.util.Optional;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
+
+    @Autowired
+    private UserRepo userRepo;
 
     private final UserService userService = new UserServiceImpl();
     private final UserDao userDao = new UserDaoImpl();
@@ -37,7 +42,7 @@ public class LoginServlet extends HttpServlet {
 
         if (userService.authorized(email, password)) {
 
-            Optional<User> optUser = userDao.findByEmail(email);
+            Optional<User> optUser = userRepo.findByEmailEquals(email);
 
             HttpSession session = req.getSession();
             session.setAttribute("currentUser", optUser.get());
@@ -51,4 +56,3 @@ public class LoginServlet extends HttpServlet {
         }
     }
 }
-

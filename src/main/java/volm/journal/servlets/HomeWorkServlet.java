@@ -1,8 +1,12 @@
 package volm.journal.servlets;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import volm.journal.dao.HomeworkDao;
 import volm.journal.dao.impl.HomeworkDaoImpl;
 import volm.journal.model.Homework;
+import volm.journal.repo.HomeworkRepo;
+import volm.journal.service.HomeworkService;
+import volm.journal.service.impl.HomeworkServiceImpl;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -18,6 +22,11 @@ public class HomeWorkServlet extends HttpServlet {
 
     private HomeworkDao homeworkDao = new HomeworkDaoImpl();
 
+    @Autowired
+    private HomeworkRepo homeworkRepo;
+
+    private HomeworkService homeworkService = new HomeworkServiceImpl();
+
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -25,7 +34,7 @@ public class HomeWorkServlet extends HttpServlet {
         String hwId = req.getParameter("hwId");
         req.setAttribute("hwId", hwId);
 
-        Homework hwById = homeworkDao.findById(Long.parseLong(hwId))
+        Homework hwById = homeworkRepo.findById(Long.parseLong(hwId))
                 .orElseThrow(() -> new NoSuchElementException());
 
         req.setAttribute("description", hwById.getHwDescription());
@@ -40,10 +49,7 @@ public class HomeWorkServlet extends HttpServlet {
         String description = req.getParameter("description");
         Long hwId = Long.parseLong(req.getParameter("hwId"));
 
-        Homework homeWork = homeworkDao.findById(hwId)
-                .orElseThrow(() -> new NoSuchElementException());
-        homeWork.setHwDescription(description);
-        homeworkDao.update(homeWork);
+        homeworkService.setNewDescription(description, hwId);
 
         resp.sendRedirect("/table");
     }

@@ -14,6 +14,8 @@ public interface UserRepo extends CrudRepository<User, Long> {
 
     List<User> findAllByGroup_Id(Long id);
 
+    List<User> findAllByGroupEqualsAndRoleEquals(Group group, Role role);
+
     List<User> findAllByRoleEquals(Role role);
 
     Optional<User> findByEmailEquals(String email);

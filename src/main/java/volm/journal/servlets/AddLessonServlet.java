@@ -8,7 +8,9 @@ import volm.journal.model.Group;
 import volm.journal.model.Homework;
 import volm.journal.model.Lesson;
 import volm.journal.model.User;
+import volm.journal.service.LessonService;
 import volm.journal.service.UserService;
+import volm.journal.service.impl.LessonServiceImpl;
 import volm.journal.service.impl.UserServiceImpl;
 
 import javax.servlet.ServletException;
@@ -29,20 +31,15 @@ public class AddLessonServlet extends HttpServlet {
     private UserService userService = new UserServiceImpl();
     private HomeworkDaoImpl homeworkDaoImpl = new HomeworkDaoImpl();
 
+    private LessonService lessonService = new LessonServiceImpl();
+
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         User currentUser = (User) req.getSession().getAttribute("currentUser");
-        Group group = currentUser.getGroup();
 
-        Lesson savedLesson = lessonDaoImpl.save(new Lesson(group, new Date()))
-                .orElseThrow(() -> new NoSuchElementException());
-
-        List<User> students = userService.findUsersByRole(group, Role.STUDENT);
-
-        students.stream()
-                .map(s -> new Homework(savedLesson, s))
-                .forEach(hw -> homeworkDaoImpl.save(hw));
+        lessonService.addLesson(currentUser);
 
         resp.sendRedirect("/table");
     }

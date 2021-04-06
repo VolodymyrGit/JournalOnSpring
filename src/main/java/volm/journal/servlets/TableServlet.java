@@ -9,7 +9,9 @@ import volm.journal.model.Group;
 import volm.journal.model.Homework;
 import volm.journal.model.Lesson;
 import volm.journal.model.User;
+import volm.journal.service.HomeworkService;
 import volm.journal.service.UserService;
+import volm.journal.service.impl.HomeworkServiceImpl;
 import volm.journal.service.impl.UserServiceImpl;
 
 import javax.servlet.ServletException;
@@ -31,6 +33,9 @@ public class TableServlet extends HttpServlet {
     private LessonDao lessonDao = new LessonDaoImpl();
 
 
+    HomeworkService homeworkService = new HomeworkServiceImpl();
+
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
@@ -43,13 +48,7 @@ public class TableServlet extends HttpServlet {
 
         List<Lesson> lessons = lessonDao.findLessonByGroup(group);
 
-        Map<Long, List<Homework>> homeworks = lessons.stream()
-                .map(l -> l.getId())
-                .collect(Collectors.toList()).stream()
-                .map(id -> homeworkDao.findByLessonId(id))
-                .flatMap(List::stream)
-                .collect(Collectors.groupingBy(hw -> hw.getStudent().getId(), Collectors.toList()));
-
+        Map<Long, List<Homework>> homeworks = homeworkService.homeworksMap(lessons);
 
         req.setAttribute("teachers", teachers);
         req.setAttribute("students", students);

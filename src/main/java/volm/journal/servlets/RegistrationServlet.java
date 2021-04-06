@@ -14,6 +14,8 @@ import volm.journal.model.Homework;
 import volm.journal.model.Lesson;
 import volm.journal.model.User;
 import volm.journal.model.UserDto;
+import volm.journal.service.UserService;
+import volm.journal.service.impl.UserServiceImpl;
 import volm.journal.util.SecurityUtil;
 
 import javax.servlet.ServletException;
@@ -34,6 +36,8 @@ public class RegistrationServlet extends HttpServlet {
     private final UserDao userDao = new UserDaoImpl();
     private final LessonDao lessonDao = new LessonDaoImpl();
     private final HomeworkDao homeworkDao = new HomeworkDaoImpl();
+
+    UserService userService = new UserServiceImpl();
 
 
     @Override
@@ -57,29 +61,16 @@ public class RegistrationServlet extends HttpServlet {
         Role role = Role.valueOf(req.getParameter("role"));
         String password = req.getParameter("password");
 
-        UserDto
+        UserDto userDto = UserDto.UserDtoBuilder.anUserDto()
+                .name(name)
+                .email(email)
+                .phone(phone)
+                .groupId(groupId)
+                .role(role)
+                .password(password)
+                .buildWithoutIdAndNpassword();
 
-
-
-        Group group = groupDao.findById(groupId)
-                .orElseThrow(() -> new NoSuchElementException());
-
-        String salt = SecurityUtil.generateRandomSalt();
-        String hashedPassword = SecurityUtil.getSecurePassword(password, salt);
-
-        User user = new User(name, email, phone, hashedPassword, salt, group, role);
-
-        List<Lesson> lessons = lessonDao.findLessonByGroup(group);
-
-        User savedUser = userDao.save(user)
-                .orElseThrow(() -> new NoSuchElementException());
-
-        if(!lessons.isEmpty() && role.name().equals("STUDENT")) {
-
-            for(Lesson l : lessons) {
-                homeworkDao.save(new Homework(l, user));
-            }
-        }
+        User savedUser = userService.registration(userDto);
 
         HttpSession session = req.getSession();
         session.setAttribute("currentUser", savedUser);
