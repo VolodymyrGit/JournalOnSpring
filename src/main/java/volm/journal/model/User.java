@@ -1,5 +1,6 @@
 package volm.journal.model;
 
+import lombok.Data;
 import volm.journal.enums.Role;
 
 import javax.persistence.Column;
@@ -11,8 +12,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.util.Objects;
 
 
+@Data
 @Entity
 @Table(name = "usr")
 public class User {
@@ -145,5 +148,25 @@ public class User {
                 ", group=" + group +
                 ", role=" + role +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id == user.id &&
+                Objects.equals(userName, user.userName) &&
+                Objects.equals(email, user.email) &&
+                Objects.equals(phoneNumber, user.phoneNumber) &&
+                Objects.equals(password, user.password) &&
+                Objects.equals(salt, user.salt) &&
+                Objects.equals(group, user.group) &&
+                role == user.role;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, userName, email, phoneNumber, password, salt, group, role);
     }
 }
