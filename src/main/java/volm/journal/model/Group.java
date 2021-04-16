@@ -1,9 +1,12 @@
 package volm.journal.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -14,9 +17,9 @@ import java.util.List;
 public class Group {
 
     @Id
-    @GeneratedValue()
     private Long id;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "group")
     private List<User> users;
 
@@ -25,6 +28,15 @@ public class Group {
 
 
     public Group() {
+    }
+
+    public Group(Long id) {
+        this.id = id;
+    }
+
+    public Group(Long id, String info) {
+        this.id = id;
+        this.info = info;
     }
 
     public Group(Long id, List<User> users, String info) {

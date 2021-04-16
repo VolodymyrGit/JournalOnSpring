@@ -2,10 +2,15 @@ package volm.journal.controller;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import volm.journal.enums.Role;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import volm.journal.exceptions.EntityNotFoundException;
+import volm.journal.security.Role;
 import volm.journal.model.Group;
 import volm.journal.model.Homework;
 import volm.journal.model.Lesson;
@@ -16,7 +21,6 @@ import volm.journal.service.HomeworkService;
 
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 
 @RequiredArgsConstructor
@@ -27,17 +31,28 @@ public class TableController {
     private final LessonRepo lessonRepo;
     private final HomeworkService homeworkService;
 
+
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STUDENT', 'TEACHER')")
     @GetMapping("/table")
-    public String getTableView(Model model) {
+    public String getTableView(@AuthenticationPrincipal User currentUser,
+                               @RequestParam(name = "group", required = false) Group selectedGroup,
+                               Model model) {
 
-        User currentUser = userRepo.findById(4L)
-                .orElseThrow(() -> new NoSuchElementException());
 
-        Group group = currentUser.getGroup();
+        Group group = null;
 
-        List<User> teachers = userRepo.findAllByGroupEqualsAndRoleEquals(group, Role.TEACHER);
+        if(selectedGroup != null) {
+            group = selectedGroup;
+        } else {
+            group = currentUser.getGroup();
+        }
 
-        List<User> students = userRepo.findAllByGroupEqualsAndRoleEquals(group, Role.STUDENT);
+
+//        Group group = currentUser.getGroup();
+
+        List<User> teachers = userRepo.findAllByGroupEqualsAndRolesContaining(group, Role.TEACHER);
+
+        List<User> students = userRepo.findAllByGroupEqualsAndRolesContaining(group, Role.STUDENT);
 
         List<Lesson> lessons = lessonRepo.findAllByGroupEquals(group);
 

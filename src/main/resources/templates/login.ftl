@@ -3,13 +3,15 @@
     <head>
         <meta charset="UTF-8">
         <title>Login</title>
-        <link rel="stylesheet" href="../css/login.css">
+<#--        <link rel="stylesheet" href="../css/login.css">-->
     </head>
     <body>
+        <h1>Login page</h1>
         <h3>${errorMessage!}</h3>
 
         <form method="post" action="/login">
-            <label><input name="login" type="text" value="${previousLogin!}"> Email</label><br>
+            <input type="hidden" name="_csrf" value="${_csrf.token}">
+            <label><input name="email" type="text" value="${previousLogin!}"> Email</label><br>
             <label><input name="password" type="password"> Password</label><br>
             <input type="submit">
         </form>

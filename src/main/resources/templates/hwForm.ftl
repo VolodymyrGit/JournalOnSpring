@@ -9,6 +9,7 @@
     <body>
 
         <form method="post" action="/hw">
+            <input type="hidden" name="_csrf" value="${_csrf.token}">
             <input type="text" name="description" value="${description!}">
             <input type="hidden" name="hwId" value="${hwId!}">
             <input type="submit">

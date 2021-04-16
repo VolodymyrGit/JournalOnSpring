@@ -12,6 +12,9 @@
     <body>
         <#list teachers as teacher>
             <h1>${teacher.getUserName()!} - ${teacher.getEmail()!}</h1>
+        <#else >
+            <h1>There will be information about the teacher</h1>
+            <h2>Teacher not added yet</h2>
         </#list>
 
         <table class="table table-bordered border-primary">
@@ -20,46 +23,54 @@
                 <td> Students</td>
 
                 <#list lessons as lesson>
+
                     <td>${lesson.getId()!}<br>${lesson.getLessonDate()!}</td>
 
-                    <#else>
-                    <td>There ara no lesson yet</td>
+                <#else>
+
+                    <#list currentUser.getRoles() as role>
+                        <#if role == "TEACHER" || role == "ADMIN" && !students??>
+                            <td>
+                                <a href="/add-lesson">Add Lesson</a>
+                            </td>
+                        </#if>
+                    </#list>
+
                 </#list>
 
-                <#if currentUser.getRole().equals("TEACHER")>
-                    <td>
-                        <a href="/add-lesson">Add Lesson</a>
-                    </td>
-                </#if>
             </tr>
 
-            <#list homeworks as student, stHomeworks>
+            <#list students as student>
+
                 <tr>
-                    <td>${student.getUserName()!}</td>
+
+                <td>${hStudent.getUserName()!"No Students in the list"}</td>
+
+
 
                     <#list stHomeworks as homework>
 
                         <#if (homework.getHwDescription())??>
 
                             <td
-                            <#if homework.isDone()>
-                                style="background-color: green"
+                                    <#if homework.isDone()>
+                                        style="background-color: green"
 
-                            <#else>
-                                    style="background-color: yellow"
-                            </#if>
+                                    <#else>
+                                        style="background-color: yellow"
+                                    </#if>
                             >
 
-                                <#if currentUser.getId() == student.getId()>
-                                    <a href="/hw?hwId=${homework.getId()}">
-                                </#if>
-                                        ${homework.getHwDescription()!}
-                                    </a>
+                                <#if currentUser.getId() == hStudent.getId()>
+                                <a href="/hw?hwId=${homework.getId()}">
+                                    </#if>
+                                    ${homework.getHwDescription()!}
+                                </a>
                             </td>
 
                         <#else>
                             <td>
-                                <#if (currentUser.getId()) == (student.getId())>
+                                <#if (currentUser.getId()) == (hStudent.getId())>
                                     <a href="/hw?hwId=${homework.getId()}">add</a>
                                 </#if>
                             </td>
@@ -69,11 +80,14 @@
                         <td>There are no homeworks in Database</td>
                     </#list>
                 </tr>
+                <#list homeworks as hStudent, stHomeworks>
 
-                    <#else>
-                        <tr>
-                            <td>There are no students in the DataBase</td>
-                        </tr>
+                <#else>
+                    <tr>
+                        <td>There are no students in the DataBase</td>
+                    </tr>
+                </#list>
+
             </#list>
         </table>
 

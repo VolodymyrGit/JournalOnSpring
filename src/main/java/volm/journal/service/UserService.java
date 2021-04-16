@@ -1,14 +1,17 @@
 package volm.journal.service;
 
+import org.springframework.stereotype.Service;
 import volm.journal.dto.RegistrationDto;
 import volm.journal.model.User;
-import volm.journal.dto.ChangeInfoDto;
 
+
+@Service
 public interface UserService {
 
-    boolean authorized(String email, String password);
 
-    User registration(RegistrationDto registrationDto);
+//    boolean authorized(String email, String password);
 
-    User updateUserInfo(ChangeInfoDto changeInfoDto, User currentUser);
+    User registerUser(RegistrationDto registrationDto);
+
+//    User updateUserInfo(ChangeInfoDto changeInfoDto, User currentUser);
 }
