@@ -11,8 +11,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import volm.journal.exceptions.EntityNotFoundException;
 import volm.journal.model.Group;
+import volm.journal.model.Homework;
+import volm.journal.model.Lesson;
 import volm.journal.model.User;
 import volm.journal.repo.GroupRepo;
+import volm.journal.repo.HomeworkRepo;
+import volm.journal.repo.LessonRepo;
 import volm.journal.repo.UserRepo;
 import volm.journal.security.Role;
 
@@ -24,6 +28,8 @@ import java.util.List;
 @Controller
 public class ListUsersController {
 
+    private final HomeworkRepo homeworkRepo;
+    private final LessonRepo lessonRepo;
     private final UserRepo userRepo;
     private final GroupRepo groupRepo;
 
@@ -67,6 +73,14 @@ public class ListUsersController {
 
             user.setGroup(group);
             userRepo.save(user);
+
+            List<Lesson> lessons = lessonRepo.findAllByGroupEquals(group);
+            List<Homework> homeworks = homeworkRepo.findAllByStudentEquals(user);
+
+            if(user.getRoles().contains(Role.STUDENT) && !lessons.isEmpty() && homeworks.isEmpty()) {
+
+                lessons.forEach(l -> homeworkRepo.save(new Homework(l, user)));
+            }
         }
 
         return "redirect:/list-users";

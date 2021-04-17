@@ -18,6 +18,7 @@ import volm.journal.model.User;
 import volm.journal.repo.LessonRepo;
 import volm.journal.repo.UserRepo;
 import volm.journal.service.HomeworkService;
+import volm.journal.service.LessonService;
 
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ public class TableController {
     private final UserRepo userRepo;
     private final LessonRepo lessonRepo;
     private final HomeworkService homeworkService;
+    private final LessonService lessonService;
 
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'STUDENT', 'TEACHER')")
@@ -47,7 +49,6 @@ public class TableController {
             group = currentUser.getGroup();
         }
 
-
 //        Group group = currentUser.getGroup();
 
         List<User> teachers = userRepo.findAllByGroupEqualsAndRolesContaining(group, Role.TEACHER);
@@ -56,7 +57,7 @@ public class TableController {
 
         List<Lesson> lessons = lessonRepo.findAllByGroupEquals(group);
 
-        Map<User, List<Homework>> homeworks = homeworkService.mapHomeworks(lessons);
+        Map<User, List<Homework>> homeworks = homeworkService.findHomeworksForEachStudent(students);
 
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("teachers", teachers);
@@ -66,5 +67,15 @@ public class TableController {
         model.addAttribute("group", group);
 
         return "table";
+    }
+
+
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STUDENT', 'TEACHER')")
+    @PostMapping("/table")
+    public String doPostTable(@RequestParam(name = "group", required = false) Group group) {
+
+        lessonService.addLesson(group);
+
+        return ("redirect:/table?group=" + group.getId());
     }
 }

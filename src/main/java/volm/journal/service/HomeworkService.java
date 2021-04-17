@@ -15,4 +15,8 @@ public interface HomeworkService {
     void setNewDescription(String description, Long hwId);
 
     Map<User, List<Homework>> mapHomeworks(List<Lesson> lessons);
+
+    List<Homework> findAllHomeworksInGroup(List<Lesson> lessons);
+
+    Map<User, List<Homework>> findHomeworksForEachStudent(List<User> students);
 }
