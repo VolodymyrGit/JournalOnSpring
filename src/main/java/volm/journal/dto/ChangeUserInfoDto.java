@@ -23,25 +23,7 @@ public class ChangeUserInfoDto {
 
     private String phone;
 
-    private Long groupId;
-
-    private Role role;
-
     private String password;
 
     private String npassword;
-
-
-    public static User turnIntoUser(ChangeUserInfoDto dto, String newPassword, Group group) {
-
-//        String salt = SecurityUtil.generateRandomSalt();
-//
-//        String newHashedPassword = SecurityUtil.getSecurePassword(dto.npassword, salt);
-
-        return new User(dto.id,
-                dto.name,
-                dto.email,
-                dto.phone,
-                newPassword);
-    }
 }

@@ -4,22 +4,20 @@ package volm.journal.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
+import volm.journal.dto.ChangeUserInfoDto;
 import volm.journal.dto.RegistrationDto;
-import volm.journal.security.Role;
-import volm.journal.model.Group;
-import volm.journal.model.Homework;
-import volm.journal.model.Lesson;
 import volm.journal.model.User;
 import volm.journal.repo.GroupRepo;
 import volm.journal.repo.HomeworkRepo;
 import volm.journal.repo.LessonRepo;
 import volm.journal.repo.UserRepo;
+import volm.journal.security.Role;
 import volm.journal.service.UserService;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 
 @RequiredArgsConstructor
@@ -85,20 +83,65 @@ public class UserServiceImpl implements UserService {
     }
 
 
-//    @Override
-//    public User updateUserInfo(ChangeInfoDto changeInfoDto, User currentUser) {
-//
-//        Group group = groupRepo.findById(changeInfoDto.getGroupId())
-//                .orElseThrow(() -> new NoSuchElementException());
-//
-//        User changedUser = ChangeInfoDto.turnIntoUser(changeInfoDto, group);
-//
-//        String hashedPassword = SecurityUtil.getSecurePassword(changeInfoDto.getPassword(), currentUser.getSalt());
-//
-//        if (!currentUser.getPassword().equals(hashedPassword)) {
-//
-//            return userRepo.save(changedUser);
-//        }
-//        return currentUser;
-//    }
+    @Override
+    public User changeUserNameAndPhone(ChangeUserInfoDto changeUserInfoDto, User currentUser) {
+
+        if(changeUserInfoDto.getName() != null) {
+            currentUser.setUserName(changeUserInfoDto.getName());
+
+            return userRepo.save(currentUser);
+        }
+
+
+        if(changeUserInfoDto.getPhone() != null) {
+            currentUser.setPhoneNumber(changeUserInfoDto.getPhone());
+
+            return userRepo.save(currentUser);
+        }
+        return userRepo.save(currentUser);
+    }
+
+
+    @Override
+    public String changeUserEmail(ChangeUserInfoDto changeUserInfoDto, User currentUser) {
+
+        if(changeUserInfoDto.getEmail() != null) {
+
+            List<String> emails = userRepo.findAll().stream()
+                    .map(User::getEmail)
+                    .collect(Collectors.toList());
+
+            if(!emails.contains(changeUserInfoDto.getEmail()) && !changeUserInfoDto.getEmail().equals("")) {
+
+                currentUser.setEmail(changeUserInfoDto.getEmail());
+
+                userRepo.save(currentUser);
+            } else {
+
+                return "User with this email is already registered";
+            }
+        }
+        return "";
+    }
+
+
+    @Override
+    public String changeUserPassword(ChangeUserInfoDto changeUserInfoDto, User currentUser) {
+
+        if (changeUserInfoDto.getPassword() != null && changeUserInfoDto.getNpassword() != null) {
+
+            String encryptedPassword = passwordEncoder.encode(changeUserInfoDto.getPassword());
+
+            if (currentUser.getPassword().equals(encryptedPassword)) {
+
+                String encryptedNewPassword = passwordEncoder.encode(changeUserInfoDto.getNpassword());
+                currentUser.setPassword(encryptedNewPassword);
+
+                userRepo.save(currentUser);
+            } else {
+                return "You entered wrong current password";
+            }
+        }
+        return "";
+    }
 }

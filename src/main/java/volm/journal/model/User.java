@@ -94,6 +94,12 @@ public class User implements UserDetails {
         this.password = password;
     }
 
+    public User(long id, String userName, String phoneNumber) {
+        this.id = id;
+        this.userName = userName;
+        this.phoneNumber = phoneNumber;
+    }
+
     public long getId() {
         return id;
     }

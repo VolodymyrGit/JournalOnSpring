@@ -29,10 +29,6 @@ public class LoginController {
     @GetMapping("/login")
     public String getLoginView(@RequestParam(required = false) String error, Model model) {
 
-//        if(error != null) {
-//            String errorMessage = "Wrong login or password";
-//            model.addAttribute("errorMessage", errorMessage);
-//        }
         return "login";
     }
 

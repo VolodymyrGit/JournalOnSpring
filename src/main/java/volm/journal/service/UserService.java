@@ -1,6 +1,8 @@
 package volm.journal.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
+import volm.journal.dto.ChangeUserInfoDto;
 import volm.journal.dto.RegistrationDto;
 import volm.journal.model.User;
 
@@ -13,5 +15,9 @@ public interface UserService {
 
     User registerUser(RegistrationDto registrationDto);
 
-//    User updateUserInfo(ChangeInfoDto changeInfoDto, User currentUser);
+    User changeUserNameAndPhone(ChangeUserInfoDto changeUserInfoDto, User currentUser);
+
+    String changeUserEmail(ChangeUserInfoDto changeUserInfoDto, User currentUser);
+
+    String changeUserPassword(ChangeUserInfoDto changeUserInfoDto, User currentUser);
 }

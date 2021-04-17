@@ -9,14 +9,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import volm.journal.exceptions.EntityNotFoundException;
-import volm.journal.security.Role;
 import volm.journal.model.Group;
 import volm.journal.model.Homework;
 import volm.journal.model.Lesson;
 import volm.journal.model.User;
 import volm.journal.repo.LessonRepo;
 import volm.journal.repo.UserRepo;
+import volm.journal.security.Role;
 import volm.journal.service.HomeworkService;
 import volm.journal.service.LessonService;
 
