@@ -4,8 +4,8 @@ package volm.journal.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
-import volm.journal.dto.ChangeUserInfoDto;
+import volm.journal.dto.ChangeUserPasswordDto;
+import volm.journal.dto.ChangeUserNameEmailPhoneDto;
 import volm.journal.dto.RegistrationDto;
 import volm.journal.model.User;
 import volm.journal.repo.GroupRepo;
@@ -84,64 +84,44 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public User changeUserNameAndPhone(ChangeUserInfoDto changeUserInfoDto, User currentUser) {
+    public User changeUserNameEmailPhone(ChangeUserNameEmailPhoneDto nameEmailPhoneDto, User currentUser) {
 
-        if(changeUserInfoDto.getName() != null) {
-            currentUser.setUserName(changeUserInfoDto.getName());
+            currentUser.setUserName(nameEmailPhoneDto.getName());
 
-            return userRepo.save(currentUser);
-        }
+        currentUser.setEmail(nameEmailPhoneDto.getEmail());
 
+        currentUser.setPhoneNumber(nameEmailPhoneDto.getPhone());
 
-        if(changeUserInfoDto.getPhone() != null) {
-            currentUser.setPhoneNumber(changeUserInfoDto.getPhone());
-
-            return userRepo.save(currentUser);
-        }
         return userRepo.save(currentUser);
     }
 
 
     @Override
-    public String changeUserEmail(ChangeUserInfoDto changeUserInfoDto, User currentUser) {
-
-        if(changeUserInfoDto.getEmail() != null) {
+    public boolean checkIfEmailNotExist(String newEmail) {
 
             List<String> emails = userRepo.findAll().stream()
                     .map(User::getEmail)
                     .collect(Collectors.toList());
 
-            if(!emails.contains(changeUserInfoDto.getEmail()) && !changeUserInfoDto.getEmail().equals("")) {
+        return !emails.contains(newEmail);
+    }
 
-                currentUser.setEmail(changeUserInfoDto.getEmail());
 
-                userRepo.save(currentUser);
-            } else {
 
-                return "User with this email is already registered";
-            }
-        }
-        return "";
+    @Override
+    public boolean compareUserPassWithEnteredCurrentPass(String currentPasswordFromForm, User currentUser) {
+
+        return passwordEncoder.matches(currentPasswordFromForm, currentUser.getPassword());
     }
 
 
     @Override
-    public String changeUserPassword(ChangeUserInfoDto changeUserInfoDto, User currentUser) {
+    public User saveEncodedPassword(User currentUser, String password) {
 
-        if (changeUserInfoDto.getPassword() != null && changeUserInfoDto.getNpassword() != null) {
+        String encodedPassword = passwordEncoder.encode(password);
+        currentUser.setPassword(encodedPassword);
+        userRepo.save(currentUser);
 
-            String encryptedPassword = passwordEncoder.encode(changeUserInfoDto.getPassword());
-
-            if (currentUser.getPassword().equals(encryptedPassword)) {
-
-                String encryptedNewPassword = passwordEncoder.encode(changeUserInfoDto.getNpassword());
-                currentUser.setPassword(encryptedNewPassword);
-
-                userRepo.save(currentUser);
-            } else {
-                return "You entered wrong current password";
-            }
-        }
-        return "";
+        return currentUser;
     }
 }

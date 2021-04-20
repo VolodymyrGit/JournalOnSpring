@@ -9,32 +9,27 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import volm.journal.dto.ChangeUserInfoDto;
+import volm.journal.dto.ChangeUserPasswordDto;
+import volm.journal.dto.ChangeUserNameEmailPhoneDto;
 import volm.journal.model.User;
 import volm.journal.repo.UserRepo;
 import volm.journal.service.UserService;
+import volm.journal.util.ValidationUtil;
 
 
 @RequiredArgsConstructor
 @Controller
 public class ChangeUserInfoController {
 
-    private final UserRepo userRepo;
     private final UserService userService;
-    private final PasswordEncoder passwordEncoder;
 
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'STUDENT', 'TEACHER')")
     @GetMapping("/change-info")
     public String getChangeInfoView(@AuthenticationPrincipal User currentUser,
-                                    @RequestParam(required = false) String emailErrorMessage,
-                                    @RequestParam(required = false) String passwordErrorMessage,
                                     Model model) {
 
         model.addAttribute("currentUser", currentUser);
-        model.addAttribute("emailErrorMessage", emailErrorMessage);
-        model.addAttribute("passwordErrorMessage", passwordErrorMessage);
 
         return "changeInfo";
     }
@@ -43,17 +38,35 @@ public class ChangeUserInfoController {
     @PreAuthorize("hasAnyAuthority('ADMIN', 'STUDENT', 'TEACHER')")
     @PostMapping("/change-info")
     public String postChangeInfo(@AuthenticationPrincipal User currentUser,
-                                 ChangeUserInfoDto changeUserInfoDto,
+                                 ChangeUserNameEmailPhoneDto nameEmailPhoneDto,
+                                 ChangeUserPasswordDto userPasswordDto,
                                  Model model) {
 
-        userService.changeUserNameAndPhone(changeUserInfoDto, currentUser);
+        if(ValidationUtil.checkWhetherParamsNotNull(nameEmailPhoneDto, currentUser)) {
 
-        String emailErrorMessage = userService.changeUserEmail(changeUserInfoDto, currentUser);
-        model.addAttribute("emailErrorMessage", emailErrorMessage);
+            if (!ValidationUtil.validateEmailByRegex(nameEmailPhoneDto.getEmail())) {
 
-        String passwordErrorMessage = userService.changeUserPassword(changeUserInfoDto, currentUser);
-        model.addAttribute("passwordErrorMessage", passwordErrorMessage);
+                model.addAttribute("emailErrorMessage", "Not correct format of email");
+            } else if (!userService.checkIfEmailNotExist(nameEmailPhoneDto.getEmail())
+                    && !currentUser.getEmail().equals(nameEmailPhoneDto.getEmail())) {
 
-        return "redirect:/change-info";
+                model.addAttribute("emailErrorMessage", "User with this email is already registered");
+            } else {
+                userService.changeUserNameEmailPhone(nameEmailPhoneDto, currentUser);
+            }
+        }
+
+        if(userPasswordDto.getPassword() != null && userPasswordDto.getNpassword() != null) {
+
+            if (userService.compareUserPassWithEnteredCurrentPass(userPasswordDto.getPassword(), currentUser)) {
+
+                userService.saveEncodedPassword(currentUser, userPasswordDto.getNpassword());
+            } else {
+                model.addAttribute("passwordErrorMessage", "You entered wrong current password");
+            }
+        }
+        model.addAttribute("currentUser", currentUser);
+
+        return "changeInfo";
     }
 }
