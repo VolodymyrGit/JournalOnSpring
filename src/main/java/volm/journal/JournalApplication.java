@@ -10,10 +10,7 @@ import volm.journal.repo.UserRepo;
 public class JournalApplication {
 
     public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(JournalApplication.class, args);
 
-        UserRepo userRepo = context.getBean(UserRepo.class);
-
-//		userRepo.save(new User(1L, "Some Name"));
+        SpringApplication.run(JournalApplication.class, args);
     }
 }

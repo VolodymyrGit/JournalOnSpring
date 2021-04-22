@@ -1,6 +1,6 @@
 package volm.journal.util;
 
-import volm.journal.dto.ChangeUserNameEmailPhoneDto;
+import volm.journal.dto.ChangeUserInfoDto;
 import volm.journal.model.User;
 
 public class ValidationUtil {
@@ -12,7 +12,7 @@ public class ValidationUtil {
     }
 
 
-    public static boolean checkWhetherParamsNotNull(ChangeUserNameEmailPhoneDto dto, User currentUser) {
+    public static boolean checkWhetherParamsNotNull(ChangeUserInfoDto dto, User currentUser) {
 
         return currentUser.getId() == dto.getId() && dto.getName() != null && dto.getEmail() != null
                 && dto.getPhone() != null;

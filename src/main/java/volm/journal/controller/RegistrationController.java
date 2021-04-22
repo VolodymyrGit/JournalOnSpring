@@ -23,7 +23,6 @@ public class RegistrationController {
         private final GroupRepo groupRepo;
 
 
-
     @GetMapping("/registration")
     public String getRegistrationView(Model model) {
 

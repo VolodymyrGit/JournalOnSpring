@@ -2,16 +2,23 @@ package volm.journal.model;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.List;
 
+
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "sgroup")
 public class Group {
@@ -27,45 +34,8 @@ public class Group {
     private String info;
 
 
-    public Group() {
-    }
-
-    public Group(Long id) {
-        this.id = id;
-    }
-
     public Group(Long id, String info) {
         this.id = id;
-        this.info = info;
-    }
-
-    public Group(Long id, List<User> users, String info) {
-        this.id = id;
-        this.users = users;
-        this.info = info;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public List<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<User> users) {
-        this.users = users;
-    }
-
-    public String getInfo() {
-        return info;
-    }
-
-    public void setInfo(String info) {
         this.info = info;
     }
 }

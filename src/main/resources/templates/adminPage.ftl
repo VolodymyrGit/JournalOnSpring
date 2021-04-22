@@ -28,22 +28,20 @@
                         <p> not defined</p>
                     </#list>
                 </td>
+
                 <td>
-
-                    <form method="post" action="/list-users">
-
+                    <form method="post" action="/set-role">
                         <input type="hidden" name="_csrf" value="${_csrf.token}">
                         <input type="hidden" name="id" value="${user.getId()!}">
-
                         <label><select name="role" required>
                                 <#list roles as role>
                                     <option value="${role.name()!}">${role.name()!}</option>
                                 </#list>
                             </select> Role </label>
-
                         <input type="submit" value="Set Role">
                     </form>
                 </td>
+
                 <td>
                     Group:
                     <#if user.getGroup()??>
@@ -52,21 +50,18 @@
                         <p> not defined</p>
                     </#if>
                 </td>
+
                 <td>
-
-                    <form method="post" action="/list-users">
-
+                    <form method="post" action="/set-group">
                         <input type="hidden" name="_csrf" value="${_csrf.token}">
-                        <input type="hidden" name="id" value="${user.getId()!}">
-
-                        <label><select name="groupId" required>
+                        <input type="hidden" name="userId" value="${user.getId()!}">
+                        <label><select name="group" required>
                                     <#list groups as group>
                                         <option value="${group.getId()!}">${group.getId()!}</option>
                                     <#else>
                                         <option>There are no groups in the database</option>
                                     </#list>
                             </select> Group id</label><br>
-
                         <input type="submit" value="Set Group">
                     </form>
                 </td>
@@ -82,20 +77,6 @@
     <a href="/cabinet">
         <button type="button">Cabinet</button>
     </a>
-
-<#--    <div>-->
-<#--        -->
-<#--            <form method="get" action="/table">-->
-<#--                <input type="hidden" name="_csrf" value="${_csrf.token}">-->
-<#--                <label>-->
-<#--                    <select name="groupId" required>-->
-<#--                        <#list groups as group>-->
-<#--                            <option value="${group.getId()!}">${group.getId()!}</option>-->
-<#--                        </#list>-->
-<#--                    </select>Select a group</label>-->
-<#--                <input type="submit" value="Group Table">-->
-<#--            </form>-->
-<#--    </div>-->
 
     <a href="/logout">
         <button type="button">logout</button>

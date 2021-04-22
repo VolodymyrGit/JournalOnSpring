@@ -7,13 +7,13 @@
 
     </head>
     <body>
+        <h2>Set Homework</h2>
 
-        <form method="post" action="/hw">
+        <form method="post" action="/homework">
             <input type="hidden" name="_csrf" value="${_csrf.token}">
-            <input type="text" name="description" value="${description!}">
-            <input type="hidden" name="hwId" value="${hwId!}">
+            <input type="hidden" name="hwId" value="${homework.getId()}">
+            <input type="text" name="hwDescription" value="${homework.getHwDescription()!}">
             <input type="submit">
-
         </form>
     </body>
 </html>

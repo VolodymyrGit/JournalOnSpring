@@ -11,7 +11,7 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @Builder
-public class ChangeUserNameEmailPhoneDto {
+public class ChangeUserInfoDto {
 
     private Long id;
 

@@ -2,17 +2,14 @@ package volm.journal.controller;
 
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import volm.journal.model.User;
 import volm.journal.repo.UserRepo;
-import volm.journal.service.UserService;
 
 import java.util.Optional;
 
@@ -21,13 +18,12 @@ import java.util.Optional;
 @Controller
 public class LoginController {
 
-    private final UserService userService;
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
 
 
     @GetMapping("/login")
-    public String getLoginView(@RequestParam(required = false) String error, Model model) {
+    public String getLoginView() {
 
         return "login";
     }
@@ -36,9 +32,9 @@ public class LoginController {
     @PostMapping("/login")
     public String postLogin(@RequestParam(name = "email") String login, String password, Model model) {
 
-                Optional<User> userFromDB = userRepo.findByEmailEquals(login);
+        Optional<User> userFromDB = userRepo.findByEmailEquals(login);
 
-                String securePass = passwordEncoder.encode(password);
+        String securePass = passwordEncoder.encode(password);
 
         if (userFromDB.isPresent() && securePass.equals(userFromDB.get().getPassword())) {
 

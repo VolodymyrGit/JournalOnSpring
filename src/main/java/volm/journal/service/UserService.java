@@ -1,8 +1,7 @@
 package volm.journal.service;
 
 import org.springframework.stereotype.Service;
-import volm.journal.dto.ChangeUserPasswordDto;
-import volm.journal.dto.ChangeUserNameEmailPhoneDto;
+import volm.journal.dto.ChangeUserInfoDto;
 import volm.journal.dto.RegistrationDto;
 import volm.journal.model.User;
 
@@ -15,11 +14,9 @@ public interface UserService {
 
     User registerUser(RegistrationDto registrationDto);
 
-    User changeUserNameEmailPhone(ChangeUserNameEmailPhoneDto nameEmailPhoneDto, User currentUser);
+    User changeUserInfo(ChangeUserInfoDto nameEmailPhoneDto, User currentUser);
 
-    boolean checkIfEmailNotExist(String newEmail);
+    boolean checkIfEmailAlreadyExist(String newEmail);
 
     User saveEncodedPassword(User currentUser, String password);
-
-    boolean compareUserPassWithEnteredCurrentPass(String currentPasswordFromForm, User currentUser);
 }

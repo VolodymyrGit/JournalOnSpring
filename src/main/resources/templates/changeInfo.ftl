@@ -22,7 +22,7 @@
 
         <h2>${passwordErrorMessage!}</h2>
 
-        <form method="post" action="/change-info">
+        <form method="post" action="/change-password">
             <input type="hidden" name="_csrf" value="${_csrf.token}">
             <input type="hidden" name="id" value="${currentUser.getId()}">
             <input type="password" name="password" placeholder="Current Password" required><br>
