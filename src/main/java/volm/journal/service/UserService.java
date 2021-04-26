@@ -1,13 +1,14 @@
 package volm.journal.service;
 
+import volm.journal.dto.RegistrationDto;
 import volm.journal.model.User;
-import volm.journal.model.UserDto;
+import volm.journal.dto.ChangeInfoDto;
 
 public interface UserService {
 
     boolean authorized(String email, String password);
 
-    User registration(UserDto userDto);
+    User registration(RegistrationDto registrationDto);
 
-    User updateUserInfo(UserDto userDto, User currentUser);
+    User updateUserInfo(ChangeInfoDto changeInfoDto, User currentUser);
 }

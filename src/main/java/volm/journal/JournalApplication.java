@@ -9,11 +9,11 @@ import volm.journal.repo.UserRepo;
 @SpringBootApplication
 public class JournalApplication {
 
-	public static void main(String[] args) {
-		ConfigurableApplicationContext context = SpringApplication.run(JournalApplication.class, args);
+    public static void main(String[] args) {
+        ConfigurableApplicationContext context = SpringApplication.run(JournalApplication.class, args);
 
-		UserRepo userRepo = context.getBean(UserRepo.class);
+        UserRepo userRepo = context.getBean(UserRepo.class);
 
 //		userRepo.save(new User(1L, "Some Name"));
-	}
+    }
 }

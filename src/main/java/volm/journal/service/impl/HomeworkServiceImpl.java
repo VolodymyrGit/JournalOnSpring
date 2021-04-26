@@ -1,8 +1,10 @@
 package volm.journal.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import volm.journal.model.Homework;
 import volm.journal.model.Lesson;
+import volm.journal.model.User;
 import volm.journal.repo.HomeworkRepo;
 import volm.journal.service.HomeworkService;
 
@@ -11,14 +13,13 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+
+@RequiredArgsConstructor
 @Service
 public class HomeworkServiceImpl implements HomeworkService {
 
-    private HomeworkRepo homeworkRepo;
+    private final HomeworkRepo homeworkRepo;
 
-    public void setHomeworkRepo(HomeworkRepo homeworkRepo) {
-        this.homeworkRepo = homeworkRepo;
-    }
 
     @Override
     public void setNewDescription(String description, Long hwId) {
@@ -30,15 +31,14 @@ public class HomeworkServiceImpl implements HomeworkService {
         homeworkRepo.save(homeWork);
     }
 
-    @Override
-    public Map<Long, List<Homework>> homeworksMap(List<Lesson> lessons) {
 
-        Map<Long, List<Homework>> homeworks = lessons.stream()
-                .map(l -> l.getId())
-                .collect(Collectors.toList()).stream()
-                .map(id -> homeworkRepo.findAllByLesson_Id(id))
+    @Override
+    public Map<User, List<Homework>> mapHomeworks(List<Lesson> lessons) {
+
+        Map<User, List<Homework>> homeworks = lessons.stream()
+                .map(lesson -> homeworkRepo.findAllByLessonEquals(lesson))
                 .flatMap(List::stream)
-                .collect(Collectors.groupingBy(hw -> hw.getStudent().getId(), Collectors.toList()));
+                .collect(Collectors.groupingBy(hw -> hw.getStudent(), Collectors.toList()));
 
         return homeworks;
     }
