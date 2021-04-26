@@ -8,12 +8,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import volm.journal.exceptions.EntityNotFoundException;
 import volm.journal.model.Group;
 import volm.journal.model.User;
 import volm.journal.repo.GroupRepo;
-import volm.journal.repo.UserRepo;
+import volm.journal.security.Role;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,16 +21,20 @@ import java.util.Optional;
 @Controller
 public class CabinetController {
 
-    private final UserRepo userRepo;
     private final GroupRepo groupRepo;
 
 
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STUDENT', 'TEACHER')")
     @GetMapping("/cabinet")
     public String getCabinetView(@AuthenticationPrincipal User currentUser, Model model) {
 
         List<Group> groups = groupRepo.findAll();
 
+        if(currentUser.getSecurityCode() != (null) && !currentUser.getRoles().contains(Role.ADMIN)) {
+
+            String message = "Please confirm your email to make full use of the magazine." +
+                    "\n We have sent you a letter, please read it and follow the link";
+            model.addAttribute("confirmEmailErrorMessage", message);
+        }
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("groups", groups);
 
@@ -40,16 +42,15 @@ public class CabinetController {
     }
 
 
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STUDENT', 'TEACHER')")
     @PostMapping("/cabinet")
-    public String doPostCabinet(@AuthenticationPrincipal User currentUser,
-                                @RequestParam(required = false) Long newGroupId,
-                                @RequestParam(required = false) String info,
-                                Model model) {
+    public String doPostCabinet() {
+        return "redirect:/cabinet";
+    }
 
-        List<Group> groups = groupRepo.findAll();
 
-        if(newGroupId != null) {
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("/cabinet-add-group")
+    public String doPostAddGroupCabinet(Long newGroupId, String info) {
 
             Optional<Group> group = groupRepo.findById(newGroupId);
 
@@ -57,10 +58,6 @@ public class CabinetController {
                 Group newGroup = new Group(newGroupId, info);
                 groupRepo.save(newGroup);
             }
-        }
-
-        model.addAttribute("currentUser", currentUser);
-
         return "redirect:/cabinet";
     }
 }

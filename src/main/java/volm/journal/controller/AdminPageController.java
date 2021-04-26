@@ -8,7 +8,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import volm.journal.exceptions.EntityNotFoundException;
 import volm.journal.model.Group;
 import volm.journal.model.Homework;
@@ -24,9 +23,10 @@ import java.util.Arrays;
 import java.util.List;
 
 
+@PreAuthorize("hasAuthority('ADMIN')")
 @RequiredArgsConstructor
 @Controller
-public class ListUsersController {
+public class AdminPageController {
 
     private final HomeworkRepo homeworkRepo;
     private final LessonRepo lessonRepo;
@@ -34,42 +34,47 @@ public class ListUsersController {
     private final GroupRepo groupRepo;
 
 
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @GetMapping("/list-users")
-    public String getListUsersView(@AuthenticationPrincipal User admin, Model model) {
+    @GetMapping("/admin-page")
+    public String getAdminPageView(@AuthenticationPrincipal User admin, Model model) {
 
         List<Group> groups = groupRepo.findAll();
 
-        List<User> users = userRepo.findAllByRolesIsNotContaining(Role.ADMIN);
+        List<User> users = userRepo.findAllByRolesIsNotContainingAndSecurityCodeEquals(Role.ADMIN, null);
+
+        List<User> usersWithUnconfirmedEmail = userRepo.findAllBySecurityCodeNotNull();
 
         List<Role> roles = Arrays.asList(Role.values());
 
         model.addAttribute("users", users);
+        model.addAttribute("unconfirmedUsers", usersWithUnconfirmedEmail);
         model.addAttribute("groups", groups);
         model.addAttribute("admin", admin);
         model.addAttribute("roles", roles);
 
-        return "listUsers";
+        return "adminPage";
     }
 
 
-    @PostMapping("/list-users")
-    public String doPostListUsers(@RequestParam(required = false) String role,
-                                  @RequestParam(required = false) Long groupId,
-                                  Long id) {
+    @PostMapping("/set-role")
+    public String doPostSetRole(String role, Long id) {
 
         User user = userRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(User.class));
 
-        if(role != null && !user.getRoles().contains(Role.valueOf(role))) {
+        if (!user.getRoles().contains(Role.valueOf(role))) {
 
-                user.getRoles().add(Role.valueOf(role));
-                userRepo.save(user);
+            user.getRoles().add(Role.valueOf(role));
+            userRepo.save(user);
         }
+        return "redirect:/admin-page";
+    }
 
-        if(groupId != null) {
-            Group group = groupRepo.findById(groupId)
-                    .orElseThrow(() -> new EntityNotFoundException(Group.class));
+
+    @PostMapping("/set-group")
+    public String doPostSetGroup(Long userId, Group group) {
+
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(User.class));
 
             user.setGroup(group);
             userRepo.save(user);
@@ -77,12 +82,10 @@ public class ListUsersController {
             List<Lesson> lessons = lessonRepo.findAllByGroupEquals(group);
             List<Homework> homeworks = homeworkRepo.findAllByStudentEquals(user);
 
-            if(user.getRoles().contains(Role.STUDENT) && !lessons.isEmpty() && homeworks.isEmpty()) {
+            if (user.getRoles().contains(Role.STUDENT) && !lessons.isEmpty() && homeworks.isEmpty()) {
 
                 lessons.forEach(l -> homeworkRepo.save(new Homework(l, user)));
             }
-        }
-
-        return "redirect:/list-users";
+        return "redirect:/admin-page";
     }
 }

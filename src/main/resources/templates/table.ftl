@@ -34,7 +34,7 @@
                     <#if role == "TEACHER" || role == "ADMIN" && students??>
 
                         <td>
-                            <form method="post" action="/table">
+                            <form method="post" action="/table-add-lesson">
 
                                 <input type="hidden" name="_csrf" value="${_csrf.token}">
                                 <input type="hidden" name="group" value="${group.getId()!}">
@@ -64,12 +64,15 @@
                                         style="background-color: yellow"
                                     </#if>
                             >
-
                                 <#if currentUser.getId() == student.getId()>
-                                    <a href="/hw?hwId=${homework.getId()}">
-                                        ${homework.getHwDescription()!}
-                                    </a>
+
+                                    <form method="get" action="/homework">
+                                        <input type="hidden" name="_csrf" value="${_csrf.token}">
+                                        <input type="hidden" name="homework" value="${homework.getId()}">
+                                        <label>${homework.getHwDescription()!}<input type="submit" value="Change"></label>
+                                    </form>
                                 <#else >
+
                                     ${homework.getHwDescription()!}
                                 </#if>
                             </td>
@@ -78,7 +81,11 @@
                             <td>
                                 <#if (currentUser.getId()) == (student.getId())>
 
-                                    <a href="/hw?hwId=${homework.getId()}">add</a>
+                                    <form method="get" action="/homework">
+                                        <input type="hidden" name="_csrf" value="${_csrf.token}">
+                                        <input type="hidden" name="homework" value="${homework.getId()}">
+                                        <input type="submit" value="Add">
+                                    </form>
                                 </#if>
                             </td>
                         </#if>
