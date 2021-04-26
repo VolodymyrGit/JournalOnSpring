@@ -16,7 +16,9 @@ public interface UserRepo extends CrudRepository<User, Long> {
     @Override
     List<User> findAll();
 
-    List<User> findAllByRolesIsNotContaining(Role role);
+    List<User> findAllByRolesIsNotContainingAndSecurityCodeEquals(Role role, String securityCode);
+
+    List<User> findAllBySecurityCodeNotNull();
 
     List<User> findAllByGroupEquals(Group group);
 
@@ -27,4 +29,6 @@ public interface UserRepo extends CrudRepository<User, Long> {
     List<User> findAllByRolesContains(Role role);
 
     Optional<User> findByEmailEquals(String email);
+
+    Optional<User> findBySecurityCodeEquals(String securityCode);
 }

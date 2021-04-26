@@ -9,14 +9,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import volm.journal.exceptions.EntityNotFoundException;
-import volm.journal.security.Role;
 import volm.journal.model.Group;
 import volm.journal.model.Homework;
 import volm.journal.model.Lesson;
 import volm.journal.model.User;
 import volm.journal.repo.LessonRepo;
 import volm.journal.repo.UserRepo;
+import volm.journal.security.Role;
 import volm.journal.service.HomeworkService;
 import volm.journal.service.LessonService;
 
@@ -34,22 +33,12 @@ public class TableController {
     private final LessonService lessonService;
 
 
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STUDENT', 'TEACHER')")
     @GetMapping("/table")
     public String getTableView(@AuthenticationPrincipal User currentUser,
-                               @RequestParam(name = "group", required = false) Group selectedGroup,
+                               @RequestParam(name = "group", required = false) Group adminGroup,
                                Model model) {
 
-
-        Group group = null;
-
-        if(selectedGroup != null) {
-            group = selectedGroup;
-        } else {
-            group = currentUser.getGroup();
-        }
-
-//        Group group = currentUser.getGroup();
+        Group group = currentUser.isAdmin() ? adminGroup : currentUser.getGroup();
 
         List<User> teachers = userRepo.findAllByGroupEqualsAndRolesContaining(group, Role.TEACHER);
 
@@ -70,12 +59,23 @@ public class TableController {
     }
 
 
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STUDENT', 'TEACHER')")
-    @PostMapping("/table")
-    public String doPostTable(@RequestParam(name = "group", required = false) Group group) {
+    @GetMapping("/admin-table")
+    public String getAdminTableView(@AuthenticationPrincipal User currentUser, Group selectedGroup) {
 
+        currentUser.setGroup(selectedGroup);
+        userRepo.save(currentUser);
+
+        return "redirect:/table";
+    }
+
+
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
+    @PostMapping("/table-add-lesson")
+    public String doPostTable(@AuthenticationPrincipal User currentUser) {
+
+        Group group = currentUser.getGroup();
         lessonService.addLesson(group);
 
-        return ("redirect:/table?group=" + group.getId());
+        return ("redirect:/table");
     }
 }

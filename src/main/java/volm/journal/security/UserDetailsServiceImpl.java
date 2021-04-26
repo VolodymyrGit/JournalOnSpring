@@ -5,11 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import volm.journal.exceptions.EntityNotFoundException;
-import volm.journal.model.User;
 import volm.journal.repo.UserRepo;
-
-import java.util.List;
 
 
 @RequiredArgsConstructor
