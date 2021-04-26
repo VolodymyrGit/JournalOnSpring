@@ -1,24 +1,37 @@
 package volm.journal.model;
 
-import lombok.Data;
-import volm.journal.enums.Role;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import volm.journal.security.Role;
 
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.util.Objects;
+import java.util.Collection;
+import java.util.List;
 
 
-@Data
+@EqualsAndHashCode
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "usr")
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -33,43 +46,52 @@ public class User {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(name = "password")
     private String password;
 
-    @Column(name = "salt", length = 4)
-    private String salt;
+//    @Column(name = "salt", length = 4)
+//    private String salt;
 
     @ManyToOne
     private Group group;
 
-    @Column(name = "role")
+    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private List<Role> roles;
 
-    public User() {
+
+    public User(String userName, String email, String phoneNumber, String password,
+                Group group, List<Role> roles) {
+        this.userName = userName;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.password = password;
+        this.group = group;
+        this.roles = roles;
     }
 
-    public User(long id, String userName, String email, String phoneNumber,
-                String password, String salt, Group group, Role role) {
+
+    public User(String userName, String email, String phoneNumber, String password) {
+        this.userName = userName;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.password = password;
+    }
+
+
+    public User(long id, String userName, String email, String phoneNumber, String password) {
         this.id = id;
         this.userName = userName;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.password = password;
-        this.salt = salt;
-        this.group = group;
-        this.role = role;
     }
 
-    public User(String userName, String email, String phoneNumber, String password,
-                String salt, Group group, Role role) {
+    public User(long id, String userName, String phoneNumber, String password) {
+        this.id = id;
         this.userName = userName;
-        this.email = email;
         this.phoneNumber = phoneNumber;
         this.password = password;
-        this.salt = salt;
-        this.group = group;
-        this.role = role;
     }
 
     public long getId() {
@@ -104,6 +126,7 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
+    @Override
     public String getPassword() {
         return password;
     }
@@ -112,13 +135,13 @@ public class User {
         this.password = password;
     }
 
-    public String getSalt() {
-        return salt;
-    }
-
-    public void setSalt(String salt) {
-        this.salt = salt;
-    }
+//    public String getSalt() {
+//        return salt;
+//    }
+//
+//    public void setSalt(String salt) {
+//        this.salt = salt;
+//    }
 
     public Group getGroup() {
         return group;
@@ -128,45 +151,42 @@ public class User {
         this.group = group;
     }
 
-    public Role getRole() {
-        return role;
+    public List<Role> getRoles() {
+        return roles;
     }
 
-    public void setRole(Role role) {
-        this.role = role;
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
+    }
+
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles;
     }
 
     @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", userName='" + userName + '\'' +
-                ", email='" + email + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", password='" + password + '\'' +
-                ", salt='" + salt + '\'' +
-                ", group=" + group +
-                ", role=" + role +
-                '}';
+    public String getUsername() {
+        return email;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return id == user.id &&
-                Objects.equals(userName, user.userName) &&
-                Objects.equals(email, user.email) &&
-                Objects.equals(phoneNumber, user.phoneNumber) &&
-                Objects.equals(password, user.password) &&
-                Objects.equals(salt, user.salt) &&
-                Objects.equals(group, user.group) &&
-                role == user.role;
+    public boolean isAccountNonExpired() {
+        return true;
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(id, userName, email, phoneNumber, password, salt, group, role);
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }

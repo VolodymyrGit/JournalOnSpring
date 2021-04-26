@@ -7,16 +7,15 @@ import lombok.Setter;
 import volm.journal.security.Role;
 import volm.journal.model.Group;
 import volm.journal.model.User;
-import volm.journal.util.SecurityUtil;
-
-import java.util.List;
 
 
 @Setter
 @Getter
 @AllArgsConstructor
 @Builder
-public class RegistrationDto {
+public class ChangeUserInfoDto {
+
+    private Long id;
 
     private String name;
 
@@ -24,22 +23,25 @@ public class RegistrationDto {
 
     private String phone;
 
-//    private Long groupId;
+    private Long groupId;
 
-//    private List<Role> roles;
+    private Role role;
 
     private String password;
 
+    private String npassword;
 
-    public static User turnIntoUser(RegistrationDto dto) {
+
+    public static User turnIntoUser(ChangeUserInfoDto dto, String newPassword, Group group) {
 
 //        String salt = SecurityUtil.generateRandomSalt();
 //
-//        String hashedPassword = SecurityUtil.getSecurePassword(dto.password, salt);
+//        String newHashedPassword = SecurityUtil.getSecurePassword(dto.npassword, salt);
 
-        return new User(dto.name,
+        return new User(dto.id,
+                dto.name,
                 dto.email,
                 dto.phone,
-                dto.password);
+                newPassword);
     }
 }

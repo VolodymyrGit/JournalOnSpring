@@ -1,7 +1,8 @@
 package volm.journal.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import volm.journal.enums.Role;
+import volm.journal.security.Role;
 import volm.journal.model.Group;
 import volm.journal.model.Homework;
 import volm.journal.model.Lesson;
@@ -10,12 +11,11 @@ import volm.journal.repo.HomeworkRepo;
 import volm.journal.repo.LessonRepo;
 import volm.journal.repo.UserRepo;
 import volm.journal.service.LessonService;
-
 import java.util.Date;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 
+@RequiredArgsConstructor
 @Service
 public class LessonServiceImpl implements LessonService {
 
@@ -23,24 +23,16 @@ public class LessonServiceImpl implements LessonService {
     private final UserRepo userRepo;
     private final HomeworkRepo homeworkRepo;
 
-    public LessonServiceImpl(LessonRepo lessonRepo, UserRepo userRepo, HomeworkRepo homeworkRepo) {
-        this.lessonRepo = lessonRepo;
-        this.userRepo = userRepo;
-        this.homeworkRepo = homeworkRepo;
-    }
-
 
     @Override
-    public void addLesson(User user) {
+    public void addLesson(Group group) {
 
-        Group group = user.getGroup();
+        Lesson newLesson = lessonRepo.save(new Lesson(group, new Date()));
 
-        Lesson savedLesson = lessonRepo.save(new Lesson(group, new Date()));
-
-        List<User> students = userRepo.findAllByGroupEqualsAndRoleEquals(group, Role.STUDENT);
+        List<User> students = userRepo.findAllByGroupEqualsAndRolesContaining(group, Role.STUDENT);
 
         students.stream()
-                .map(s -> new Homework(savedLesson, s))
-                .forEach(hw -> homeworkRepo.save(hw));
+                .map(student -> new Homework(newLesson, student))
+                .forEach(homeworkRepo::save);
     }
 }

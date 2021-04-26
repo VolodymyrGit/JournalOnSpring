@@ -6,7 +6,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import volm.journal.dto.RegistrationDto;
 import volm.journal.model.Group;
 import volm.journal.model.User;
@@ -28,7 +27,7 @@ public class RegistrationController {
     @GetMapping("/registration")
     public String getRegistrationView(Model model) {
 
-        List<Group> groups = (List<Group>) groupRepo.findAll();
+        List<Group> groups = groupRepo.findAll();
 
         model.addAttribute("groups", groups);
 
@@ -39,9 +38,9 @@ public class RegistrationController {
     @PostMapping("/registration")
     public String postRegistration(RegistrationDto registrationDto, Model model) {
 
-                User savedUser = userService.registration(registrationDto);
+        User savedUser = userService.registerUser(registrationDto);
 
-                model.addAttribute("currentUser", savedUser);
+        model.addAttribute("currentUser", savedUser);
 
         return "redirect:/cabinet";
     }
