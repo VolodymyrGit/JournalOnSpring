@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import volm.journal.model.Group;
 import volm.journal.model.User;
 import volm.journal.repo.GroupRepo;
+import volm.journal.security.Role;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +29,12 @@ public class CabinetController {
 
         List<Group> groups = groupRepo.findAll();
 
+        if(currentUser.getSecurityCode() != (null) && !currentUser.getRoles().contains(Role.ADMIN)) {
+
+            String message = "Please confirm your email to make full use of the magazine." +
+                    "\n We have sent you a letter, please read it and follow the link";
+            model.addAttribute("confirmEmailErrorMessage", message);
+        }
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("groups", groups);
 

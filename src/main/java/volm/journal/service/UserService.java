@@ -10,9 +10,9 @@ import volm.journal.model.User;
 public interface UserService {
 
 
-//    boolean authorized(String email, String password);
-
     User registerUser(RegistrationDto registrationDto);
+
+    void validateEmailBySendingMessage(User user);
 
     User changeUserInfo(ChangeUserInfoDto nameEmailPhoneDto, User currentUser);
 

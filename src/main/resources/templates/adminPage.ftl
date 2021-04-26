@@ -74,6 +74,19 @@
         </#list>
     </table>
 
+    <h1>List of users with an unconfirmed email</h1>
+
+    <table class="table table-bordered border-primary">
+        <#list unconfirmedUsers as user>
+
+            <tr>
+                <td>${user.getUserName()!}</td>
+                <td>${user.getEmail()!}</td>
+            </tr>
+        </#list>
+    </table>
+
+
     <a href="/cabinet">
         <button type="button">Cabinet</button>
     </a>

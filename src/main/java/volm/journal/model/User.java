@@ -44,11 +44,13 @@ public class User implements UserDetails {
     @Column(name = "u_name")
     private String userName;
 
-    @Column(name = "email", unique = true)
+    @Column(unique = true)
     private String email;
 
     @Column(name = "phone_number")
     private String phoneNumber;
+
+    private String securityCode;
 
     private String password;
 
@@ -59,6 +61,11 @@ public class User implements UserDetails {
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
     private List<Role> roles;
+
+
+    public boolean isAdmin() {
+        return roles.contains(Role.ADMIN);
+    }
 
 
     public User(String userName, String email, String phoneNumber, String password) {

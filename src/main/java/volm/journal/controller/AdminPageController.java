@@ -39,11 +39,14 @@ public class AdminPageController {
 
         List<Group> groups = groupRepo.findAll();
 
-        List<User> users = userRepo.findAllByRolesIsNotContaining(Role.ADMIN);
+        List<User> users = userRepo.findAllByRolesIsNotContainingAndSecurityCodeEquals(Role.ADMIN, null);
+
+        List<User> usersWithUnconfirmedEmail = userRepo.findAllBySecurityCodeNotNull();
 
         List<Role> roles = Arrays.asList(Role.values());
 
         model.addAttribute("users", users);
+        model.addAttribute("unconfirmedUsers", usersWithUnconfirmedEmail);
         model.addAttribute("groups", groups);
         model.addAttribute("admin", admin);
         model.addAttribute("roles", roles);

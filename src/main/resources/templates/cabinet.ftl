@@ -11,6 +11,9 @@
 
             <h1>${currentUser.getUserName()}</h1>
 
+            <#if confirmEmailErrorMessage??>
+                <h3 style="color: red">${confirmEmailErrorMessage}</h3>
+            </#if>
             <h1>Email - ${currentUser.getEmail()}</h1>
 
             <h1>Phone Number - ${currentUser.getPhoneNumber()}</h1>
@@ -19,10 +22,7 @@
 
                 <#list currentUser.getRoles() as role>
 
-                    <#if role == "ADMIN">
-
-                        <h1>The last revised table of Group ${currentUser.getGroup().getId()}</h1>
-                    <#else >
+                    <#if role != "ADMIN">
 
                         <h1>Group Id - ${currentUser.getGroup().getId()!}</h1>
                     </#if>
@@ -56,7 +56,7 @@
 
                     <#if groups??>
 
-                        <form method="get" action="/admin-table">
+                        <form method="get" action="/table">
                             <input type="hidden" name="_csrf" value="${_csrf.token}">
                             <label>Go to Group <select name="group" required>
                                     <#list groups as group>
