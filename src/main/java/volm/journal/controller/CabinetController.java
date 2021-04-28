@@ -31,8 +31,8 @@ public class CabinetController {
 
         if(currentUser.getSecurityCode() != (null) && !currentUser.getRoles().contains(Role.ADMIN)) {
 
-            String message = "Please confirm your email to make full use of the magazine." +
-                    "\n We have sent you a letter, please read it and follow the link";
+            String message = "Please confirm your email to make full use of the journal." +
+                    " We have sent you a letter, please read it and follow the link";
             model.addAttribute("confirmEmailErrorMessage", message);
         }
         model.addAttribute("currentUser", currentUser);
