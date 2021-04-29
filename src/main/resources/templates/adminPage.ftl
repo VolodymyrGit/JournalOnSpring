@@ -18,7 +18,10 @@
         <#list users as user>
 
             <tr>
-                <td>${user.getUserName()!} ${user.getEmail()!}</td>
+
+                <td>${user.getUserName()!}</td>
+
+                <td>${user.getEmail()!}</td>
 
                 <td>
                     Roles:
