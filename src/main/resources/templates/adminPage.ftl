@@ -83,6 +83,11 @@
                 <td>${user.getUserName()!}</td>
                 <td>${user.getEmail()!}</td>
             </tr>
+        <#else >
+
+            <tr>
+                <td>There are no users in the database with an unconfirmed email</td>
+            </tr>
         </#list>
     </table>
 
